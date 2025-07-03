@@ -7,6 +7,7 @@ import Leaves from './pages/Leaves';
 import Attendance from './pages/Attendance';
 import Payroll from './pages/Payroll';
 import Recruitment from './pages/Recruitment';
+import Settings from './pages/Settings';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
@@ -57,6 +58,7 @@ function Layout() {
           <Route path="/attendance" element={<Attendance />} />
           <Route path="/payroll" element={<Payroll />} />
           <Route path="/recruitment" element={<Recruitment />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
       </div>

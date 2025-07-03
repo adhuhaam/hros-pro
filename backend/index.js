@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');
 const usersRouter = require('./routes/users');
 const rolesRouter = require('./routes/roles');
 const agentsRouter = require('./routes/agents');
+const settingsRouter = require('./routes/settings');
 
 const app = express();
 const prisma = new PrismaClient();
@@ -20,6 +21,7 @@ app.use(express.json());
 app.use('/api/users', usersRouter);
 app.use('/api/roles', rolesRouter);
 app.use('/api/agents', agentsRouter);
+app.use('/api/settings', settingsRouter);
 
 app.get('/', (req, res) => {
     res.send('HRMS Backend API is running');
