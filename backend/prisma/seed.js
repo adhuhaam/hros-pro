@@ -316,36 +316,83 @@ async function main() {
         });
     }
 
-    // Seed Sample Agents
+    // Seed Sample Agents with user accounts
+    const agentRole = await prisma.role.findUnique({ where: { name: 'agent' } });
     const agents = [
         {
-            name: 'Tech Recruiters Inc',
+            fullName: 'Tech Recruiters Inc',
             email: 'contact@techrecruiters.com',
             phone: '+1234567001',
-            address: '100 Tech Street, Silicon Valley, CA',
-            commissionRate: 15.0,
+            company: 'Tech Recruiters Inc',
+            commission: 15.0,
+            password: 'agent123',
         },
         {
-            name: 'HR Solutions Pro',
+            fullName: 'HR Solutions Pro',
             email: 'info@hrsolutionspro.com',
             phone: '+1234567002',
-            address: '200 HR Avenue, Business District, NY',
-            commissionRate: 12.5,
+            company: 'HR Solutions Pro',
+            commission: 12.5,
+            password: 'agent123',
         },
         {
-            name: 'Talent Hunters',
+            fullName: 'Talent Hunters',
             email: 'hello@talenthunters.com',
             phone: '+1234567003',
-            address: '300 Talent Road, Innovation Hub, TX',
-            commissionRate: 18.0,
+            company: 'Talent Hunters',
+            commission: 18.0,
+            password: 'agent123',
         },
     ];
 
-    for (const agent of agents) {
-        await prisma.agent.upsert({
-            where: { email: agent.email },
+    for (const agentData of agents) {
+        // Create user account for agent
+        const hashedPassword = await bcrypt.hash(agentData.password, 10);
+        
+        const user = await prisma.user.upsert({
+            where: { email: agentData.email },
             update: {},
-            create: agent,
+            create: {
+                email: agentData.email,
+                password: hashedPassword,
+                fullName: agentData.fullName,
+                phone: agentData.phone,
+                isActive: true
+            }
+        });
+
+        // Assign agent role
+        if (agentRole) {
+            await prisma.userRole.upsert({
+                where: {
+                    userId_roleId: {
+                        userId: user.id,
+                        roleId: agentRole.id,
+                    },
+                },
+                update: {},
+                create: {
+                    userId: user.id,
+                    roleId: agentRole.id,
+                },
+            });
+        }
+
+        // Create agent profile
+        const agentId = `AGT${String(Date.now()).slice(-6)}${Math.floor(Math.random() * 100)}`;
+        await prisma.agent.upsert({
+            where: { email: agentData.email },
+            update: {},
+            create: {
+                userId: user.id,
+                agentId: agentId,
+                fullName: agentData.fullName,
+                email: agentData.email,
+                phone: agentData.phone,
+                company: agentData.company,
+                commission: agentData.commission,
+                status: 'active'
+            },
         });
     }
 

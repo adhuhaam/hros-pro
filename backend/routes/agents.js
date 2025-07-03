@@ -246,7 +246,7 @@ router.get('/:id/candidates', async (req, res) => {
 
         const whereClause = { agentId };
         if (status) whereClause.status = status;
-        if (position) whereClause.position = { contains: position, mode: 'insensitive' };
+        if (position) whereClause.position = { contains: position };
 
         const candidates = await prisma.candidate.findMany({
             where: whereClause,
@@ -265,6 +265,7 @@ router.post('/:id/candidates', async (req, res) => {
     try {
         const agentId = parseInt(req.params.id);
         const {
+            jobId,
             fullName,
             email,
             phone,
@@ -273,6 +274,13 @@ router.post('/:id/candidates', async (req, res) => {
             resume,
             notes
         } = req.body;
+
+        // Validate required fields
+        if (!jobId || !fullName || !email || !position) {
+            return res.status(400).json({ 
+                error: 'Missing required fields: jobId, fullName, email, and position are required' 
+            });
+        }
 
         // Check if agent exists
         const agent = await prisma.agent.findUnique({
@@ -283,9 +291,33 @@ router.post('/:id/candidates', async (req, res) => {
             return res.status(404).json({ error: 'Agent not found' });
         }
 
+        // Check if job exists
+        const job = await prisma.recruitment.findUnique({
+            where: { id: parseInt(jobId) }
+        });
+
+        if (!job) {
+            return res.status(404).json({ error: 'Job/Recruitment not found' });
+        }
+
+        // Check if candidate already exists for this job
+        const existingCandidate = await prisma.candidate.findFirst({
+            where: {
+                email,
+                jobId: parseInt(jobId)
+            }
+        });
+
+        if (existingCandidate) {
+            return res.status(400).json({ 
+                error: 'Candidate with this email already applied for this job' 
+            });
+        }
+
         const candidate = await prisma.candidate.create({
             data: {
                 agentId,
+                jobId: parseInt(jobId),
                 fullName,
                 email,
                 phone,
@@ -294,12 +326,17 @@ router.post('/:id/candidates', async (req, res) => {
                 resume,
                 notes,
                 status: 'pending'
+            },
+            include: {
+                job: true,
+                agent: true
             }
         });
 
         res.status(201).json({
             message: 'Candidate created successfully',
-            candidateId: candidate.id
+            candidateId: candidate.id,
+            candidate
         });
     } catch (error) {
         console.error('Error creating candidate:', error);
