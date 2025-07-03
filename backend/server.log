@@ -1,0 +1,68 @@
+[dotenv@17.0.1] injecting env (0) from .env – [tip] encrypt with dotenvx: https://dotenvx.com
+Server running on port 4000
+PrismaClientValidationError: 
+Invalid `prisma.employee.update()` invocation in
+/Users/adhuhaam/Music/july/hros-pro/backend/index.js:81:48
+
+  78 try {
+  79     const { id } = req.params;
+  80     const { fullName, email, phone, address, dob, departmentId, designationId, dateOfJoining } = req.body;
+→ 81     const employee = await prisma.employee.update({
+           where: {
+             id: 1
+           },
+           data: {
+             fullName: "Super Admin",
+             email: "superadmin@yourdomain.com",
+             phone: null,
+             address: null,
+             dob: null,
+             departmentId: "2",
+                           ~~~
+             designationId: "2",
+             dateOfJoining: null
+           }
+         })
+
+Argument `departmentId`: Invalid value provided. Expected Int, NullableIntFieldUpdateOperationsInput or Null, provided String.
+    at kn (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:32:1363)
+    at Xn.handleRequestError (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:124:7102)
+    at Xn.handleAndLogRequestError (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:124:6784)
+    at Xn.request (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:124:6491)
+    at async l (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:133:9812)
+    at async /Users/adhuhaam/Music/july/hros-pro/backend/index.js:81:26 {
+  clientVersion: '6.11.0'
+}
+PrismaClientValidationError: 
+Invalid `prisma.employee.update()` invocation in
+/Users/adhuhaam/Music/july/hros-pro/backend/index.js:81:48
+
+  78 try {
+  79     const { id } = req.params;
+  80     const { fullName, email, phone, address, dob, departmentId, designationId, dateOfJoining } = req.body;
+→ 81     const employee = await prisma.employee.update({
+           where: {
+             id: 1
+           },
+           data: {
+             fullName: "Super Admin",
+             email: "superadmin@yourdomain.com",
+             phone: "7559001",
+             address: "Goldenray",
+             dob: null,
+             departmentId: "2",
+                           ~~~
+             designationId: "2",
+             dateOfJoining: null
+           }
+         })
+
+Argument `departmentId`: Invalid value provided. Expected Int, NullableIntFieldUpdateOperationsInput or Null, provided String.
+    at kn (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:32:1363)
+    at Xn.handleRequestError (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:124:7102)
+    at Xn.handleAndLogRequestError (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:124:6784)
+    at Xn.request (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:124:6491)
+    at async l (/Users/adhuhaam/Music/july/hros-pro/backend/generated/prisma/runtime/library.js:133:9812)
+    at async /Users/adhuhaam/Music/july/hros-pro/backend/index.js:81:26 {
+  clientVersion: '6.11.0'
+}

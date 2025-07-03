@@ -15,19 +15,68 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  role      String   // 'employee', 'hr', 'admin', etc.
-  employee  Employee?
+  id          Int           @id @default(autoincrement())
+  email       String        @unique
+  password    String
+  fullName    String
+  phone       String?
+  isActive    Boolean       @default(true)
+  lastLogin   DateTime?
+  employee    Employee?
+  agent       Agent?
+  userRoles   UserRole[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Role {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  description String?
+  permissions RolePermission[]
+  userRoles   UserRole[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Permission {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  description String?
+  resource    String        // e.g., 'employees', 'payroll', 'recruitment'
+  action      String        // e.g., 'create', 'read', 'update', 'delete'
+  rolePermissions RolePermission[]
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model RolePermission {
+  id           Int        @id @default(autoincrement())
+  roleId       Int
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId Int
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([roleId, permissionId])
+}
+
+model UserRole {
+  id     Int    @id @default(autoincrement())
+  userId Int
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  roleId Int
+  role   Role   @relation(fields: [roleId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+
+  @@unique([userId, roleId])
 }
 
 model Employee {
   id            Int         @id @default(autoincrement())
   userId        Int?        @unique
   user          User?       @relation(fields: [userId], references: [id])
+  employeeId    String      @unique // Employee ID like "EMP001"
   fullName      String
   email         String      @unique
   phone         String?
@@ -38,11 +87,48 @@ model Employee {
   designationId Int?
   designation   Designation? @relation(fields: [designationId], references: [id])
   dateOfJoining DateTime?
+  salary        Float?
+  status        String      @default("active") // active, inactive, terminated
   leaves        Leave[]
   attendance    Attendance[]
   payrolls      Payroll[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
+}
+
+model Agent {
+  id          Int           @id @default(autoincrement())
+  userId      Int?          @unique
+  user        User?         @relation(fields: [userId], references: [id])
+  agentId     String        @unique // Agent ID like "AGT001"
+  fullName    String
+  email       String        @unique
+  phone       String?
+  company     String?       // Agency/Company name
+  commission  Float?        // Commission percentage
+  status      String        @default("active") // active, inactive
+  candidates  Candidate[]
+  jobs        Recruitment[] // Jobs assigned to this agent
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Candidate {
+  id          Int       @id @default(autoincrement())
+  agentId     Int
+  agent       Agent     @relation(fields: [agentId], references: [id])
+  jobId       Int
+  job         Recruitment @relation(fields: [jobId], references: [id])
+  fullName    String
+  email       String
+  phone       String?
+  resume      String?   // File path or URL
+  position    String
+  experience  Int?      // Years of experience
+  status      String    @default("pending") // pending, shortlisted, rejected, hired
+  notes       String?
+  appliedAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Department {
@@ -104,4 +190,7 @@ model Recruitment {
   closedAt      DateTime?
   applicants    String?   // JSON or separate table for real apps
   numberOfPosts Int       @default(1)
+  agentId       Int?      // Assigned agent
+  agent         Agent?    @relation(fields: [agentId], references: [id])
+  candidates    Candidate[]
 }
