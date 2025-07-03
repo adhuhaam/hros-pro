@@ -3,38 +3,152 @@ module.exports = {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
+  darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'sans': ['Aptos', 'system-ui', 'sans-serif'],
+      },
+      colors: {
+        primary: {
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#006bad',
+          600: '#005a94',
+          700: '#004a7a',
+          800: '#003a61',
+          900: '#002a47',
+        },
+        background: {
+          primary: '#0a0a0a',
+          secondary: '#1a1a1a',
+          tertiary: '#2a2a2a',
+        },
+        text: {
+          primary: '#ffffff',
+          secondary: '#e5e7eb',
+          muted: '#9ca3af',
+        },
+        border: {
+          DEFAULT: '#374151',
+          light: '#4b5563',
+        }
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.5s ease-in-out',
+        'slide-up': 'slideUp 0.3s ease-out',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'glow': 'glow 2s ease-in-out infinite alternate',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(10px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        glow: {
+          '0%': { boxShadow: '0 0 5px rgba(0, 107, 173, 0.3)' },
+          '100%': { boxShadow: '0 0 20px rgba(0, 107, 173, 0.6)' },
+        },
+      },
+      backdropBlur: {
+        xs: '2px',
+      },
+      boxShadow: {
+        'glow': '0 0 20px rgba(0, 107, 173, 0.3)',
+        'glow-success': '0 0 20px rgba(34, 211, 238, 0.3)',
+        'glow-warning': '0 0 20px rgba(251, 191, 36, 0.3)',
+        'glow-error': '0 0 20px rgba(248, 113, 113, 0.3)',
+      },
+    },
   },
   plugins: [require('daisyui')],
   daisyui: {
     themes: [
       {
-        monochrome: {
-          "primary": "#e5e7eb", // light gray
-          "secondary": "#9ca3af", // medium gray
-          "accent": "#6b7280", // accent gray
-          "neutral": "#18181b", // almost black
-          "base-100": "#111113", // darkest background
-          "base-200": "#18181b", // dark background
-          "base-300": "#27272a", // border gray
-          "info": "#a3a3a3",
+        light: {
+          "primary": "#006bad",
+          "primary-focus": "#005a94",
+          "primary-content": "#ffffff",
+          "secondary": "#64748b",
+          "secondary-focus": "#475569",
+          "secondary-content": "#ffffff",
+          "accent": "#475569",
+          "accent-focus": "#334155",
+          "accent-content": "#ffffff",
+          "neutral": "#f8fafc",
+          "neutral-focus": "#f1f5f9",
+          "neutral-content": "#1e293b",
+          "base-100": "#ffffff",
+          "base-200": "#f8fafc",
+          "base-300": "#f1f5f9",
+          "base-content": "#1e293b",
+          "info": "#3b82f6",
+          "info-content": "#ffffff",
           "success": "#22d3ee",
+          "success-content": "#000000",
           "warning": "#fbbf24",
+          "warning-content": "#000000",
           "error": "#f87171",
-          "--rounded-box": "1.5rem",
-          "--rounded-btn": "1.25rem",
-          "--rounded-badge": "1.25rem",
+          "error-content": "#ffffff",
+          "--rounded-box": "1rem",
+          "--rounded-btn": "0.75rem",
+          "--rounded-badge": "0.5rem",
           "--animation-btn": "0.25s",
           "--animation-input": "0.2s",
           "--btn-text-case": "none",
           "--navbar-padding": "0.5rem",
-          "--border-btn": "2px",
+          "--border-btn": "1px",
+          "--tab-border": "1px",
+          "--tab-radius": "0.5rem",
         },
       },
-      "dark"
+      {
+        dark: {
+          "primary": "#006bad",
+          "primary-focus": "#005a94",
+          "primary-content": "#ffffff",
+          "secondary": "#9ca3af",
+          "secondary-focus": "#6b7280",
+          "secondary-content": "#ffffff",
+          "accent": "#6b7280",
+          "accent-focus": "#4b5563",
+          "accent-content": "#ffffff",
+          "neutral": "#18181b",
+          "neutral-focus": "#111113",
+          "neutral-content": "#ffffff",
+          "base-100": "#0a0a0a",
+          "base-200": "#1a1a1a",
+          "base-300": "#2a2a2a",
+          "base-content": "#ffffff",
+          "info": "#3b82f6",
+          "info-content": "#ffffff",
+          "success": "#22d3ee",
+          "success-content": "#000000",
+          "warning": "#fbbf24",
+          "warning-content": "#000000",
+          "error": "#f87171",
+          "error-content": "#ffffff",
+          "--rounded-box": "1rem",
+          "--rounded-btn": "0.75rem",
+          "--rounded-badge": "0.5rem",
+          "--animation-btn": "0.25s",
+          "--animation-input": "0.2s",
+          "--btn-text-case": "none",
+          "--navbar-padding": "0.5rem",
+          "--border-btn": "1px",
+          "--tab-border": "1px",
+          "--tab-radius": "0.5rem",
+        },
+      }
     ],
-    darkTheme: "monochrome",
+    darkTheme: "dark",
   },
 }
 

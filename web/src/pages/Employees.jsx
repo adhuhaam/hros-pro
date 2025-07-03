@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useHeader } from '../context/HeaderContext';
 
 const API_URL = 'http://localhost:4000/api/employees';
 const DEPT_URL = 'http://localhost:4000/api/departments';
@@ -13,6 +14,7 @@ function validate(form) {
 }
 
 export default function Employees() {
+  const { updateHeader } = useHeader();
   const [employees, setEmployees] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [designations, setDesignations] = useState([]);
@@ -54,6 +56,10 @@ export default function Employees() {
       setDesignations(data);
     } catch {}
   };
+
+  useEffect(() => {
+    updateHeader('Employees');
+  }, [updateHeader]);
 
   useEffect(() => { fetchEmployees(); fetchDepartments(); fetchDesignations(); }, []);
 
@@ -132,10 +138,9 @@ export default function Employees() {
   };
 
   return (
-    <div className="min-h-screen bg-base-100 text-primary">
-      <div className="max-w-7xl mx-auto py-10 px-2 sm:px-4">
+    <div className="flex-1 p-4 sm:p-6 bg-gradient-to-br from-base-100 to-base-200/50">
+      <div className="max-w-7xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-4">
-          <h1 className="text-3xl font-extrabold text-primary tracking-tight">Employees</h1>
           <div className="flex gap-2">
             <button className="btn btn-neutral shadow-md" onClick={openAddModal}>Add Employee</button>
           </div>
