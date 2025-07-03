@@ -58,6 +58,18 @@ app.post('/api/auth/login', async (req, res) => {
 
         const roles = user.userRoles.map(ur => ur.role.name);
         const userType = user.employee ? 'employee' : user.agent ? 'agent' : 'user';
+        
+        // Add agent-specific data if user is an agent
+        let agentData = null;
+        if (user.agent) {
+            agentData = {
+                agentId: user.agent.id,
+                agentCode: user.agent.agentId,
+                company: user.agent.company,
+                commission: user.agent.commission,
+                status: user.agent.status
+            };
+        }
 
         const token = jwt.sign(
             {
@@ -65,7 +77,8 @@ app.post('/api/auth/login', async (req, res) => {
                 roles: roles,
                 userType: userType,
                 email: user.email,
-                fullName: user.fullName
+                fullName: user.fullName,
+                agentId: user.agent?.id || null
             },
             process.env.JWT_SECRET || 'devsecret',
             { expiresIn: '1d' }
@@ -78,7 +91,8 @@ app.post('/api/auth/login', async (req, res) => {
                 email: user.email,
                 fullName: user.fullName,
                 roles: roles,
-                userType: userType
+                userType: userType,
+                agent: agentData
             }
         });
     } catch (err) {
@@ -103,9 +117,26 @@ app.get('/api/employees', async (req, res) => {
 
 app.post('/api/employees', async (req, res) => {
     try {
-        const { fullName, email, phone, address, dob, departmentId, designationId, dateOfJoining } = req.body;
+        const { fullName, email, phone, address, dob, departmentId, designationId, dateOfJoining, salary } = req.body;
+        
+        // Generate employee ID
+        const lastEmployee = await prisma.employee.findFirst({
+            orderBy: { id: 'desc' },
+            select: { employeeId: true }
+        });
+        
+        let nextEmpNumber = 1;
+        if (lastEmployee && lastEmployee.employeeId) {
+            const match = lastEmployee.employeeId.match(/\d+$/);
+            if (match) {
+                nextEmpNumber = parseInt(match[0]) + 1;
+            }
+        }
+        const employeeId = `EMP${String(nextEmpNumber).padStart(3, '0')}`;
+        
         const employee = await prisma.employee.create({
             data: {
+                employeeId,
                 fullName,
                 email,
                 phone,
@@ -114,6 +145,7 @@ app.post('/api/employees', async (req, res) => {
                 departmentId: departmentId ? Number(departmentId) : null,
                 designationId: designationId ? Number(designationId) : null,
                 dateOfJoining: dateOfJoining ? new Date(dateOfJoining) : null,
+                salary: salary ? parseFloat(salary) : null,
             },
         });
         res.status(201).json(employee);

@@ -120,18 +120,19 @@ async function main() {
             email: 'superadmin@yourdomain.com',
             password,
             fullName: 'Super Admin',
-            employee: {
-                create: {
-                    fullName: 'Super Admin',
-                    email: 'superadmin@yourdomain.com',
-                    phone: '+1234567890',
-                    address: '123 Admin Street, City, State',
-                    dob: new Date('1985-01-15'),
-                    dateOfJoining: new Date('2023-01-01'),
-                    departmentId: 1, // HR
-                    designationId: 1, // Manager
+                            employee: {
+                    create: {
+                        employeeId: 'EMP001',
+                        fullName: 'Super Admin',
+                        email: 'superadmin@yourdomain.com',
+                        phone: '+1234567890',
+                        address: '123 Admin Street, City, State',
+                        dob: new Date('1985-01-15'),
+                        dateOfJoining: new Date('2023-01-01'),
+                        departmentId: 1, // HR
+                        designationId: 1, // Manager
+                    },
                 },
-            },
         },
     });
 
@@ -308,12 +309,18 @@ async function main() {
     ];
 
     // Create sample employees
+    let empCounter = 2; // Start from 2 since EMP001 is superadmin
     for (const emp of sampleEmployees) {
+        const employeeId = `EMP${String(empCounter).padStart(3, '0')}`;
         await prisma.employee.upsert({
             where: { email: emp.email },
             update: {},
-            create: emp,
+            create: {
+                ...emp,
+                employeeId: employeeId
+            },
         });
+        empCounter++;
     }
 
     // Seed Sample Agents with user accounts
@@ -397,46 +404,38 @@ async function main() {
     }
 
     // Seed Sample Recruitment Jobs
+    // First, get the created agents
+    const techRecruiter = await prisma.agent.findUnique({ where: { email: 'contact@techrecruiters.com' } });
+    const hrSolutions = await prisma.agent.findUnique({ where: { email: 'info@hrsolutionspro.com' } });
+    const talentHunters = await prisma.agent.findUnique({ where: { email: 'hello@talenthunters.com' } });
+
     const recruitmentJobs = [
         {
-            title: 'Senior Software Developer',
-            description: 'Experienced developer for web applications',
-            requirements: '5+ years experience, React, Node.js, MySQL',
+            position: 'Senior Software Developer',
+            department: 'IT',
             numberOfPosts: 3,
-            salary: 80000,
-            status: 'ACTIVE',
-            agentId: 1, // Tech Recruiters Inc
+            status: 'open',
+            agentId: techRecruiter?.id || null,
         },
         {
-            title: 'HR Manager',
-            description: 'Lead HR operations and team management',
-            requirements: '3+ years HR experience, leadership skills',
+            position: 'HR Manager',
+            department: 'HR',
             numberOfPosts: 1,
-            salary: 65000,
-            status: 'ACTIVE',
-            agentId: 2, // HR Solutions Pro
+            status: 'open',
+            agentId: hrSolutions?.id || null,
         },
         {
-            title: 'Marketing Specialist',
-            description: 'Digital marketing and brand management',
-            requirements: '2+ years marketing experience, social media skills',
+            position: 'Marketing Specialist',
+            department: 'Marketing',
             numberOfPosts: 2,
-            salary: 55000,
-            status: 'ACTIVE',
-            agentId: 3, // Talent Hunters
+            status: 'open',
+            agentId: talentHunters?.id || null,
         },
     ];
 
     for (const job of recruitmentJobs) {
-        await prisma.recruitment.upsert({
-            where: {
-                title_agentId: {
-                    title: job.title,
-                    agentId: job.agentId,
-                }
-            },
-            update: {},
-            create: job,
+        await prisma.recruitment.create({
+            data: job,
         });
     }
 

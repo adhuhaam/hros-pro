@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import Login from './pages/Login';
+import AgentLogin from './pages/AgentLogin';
 import Employees from './pages/Employees';
 import Leaves from './pages/Leaves';
 import Attendance from './pages/Attendance';
@@ -70,6 +71,7 @@ function App() {
         <Router>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/agent-login" element={<AgentLogin />} />
             <Route path="/*" element={<Layout />} />
           </Routes>
         </Router>

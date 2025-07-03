@@ -1,7 +1,61 @@
 const express = require('express');
 const { PrismaClient } = require('../generated/prisma');
+const jwt = require('jsonwebtoken');
 const router = express.Router();
 const prisma = new PrismaClient();
+
+// Middleware to verify JWT token
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ error: 'Access token required' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET || 'devsecret', (err, user) => {
+        if (err) {
+            return res.status(403).json({ error: 'Invalid token' });
+        }
+        req.user = user;
+        next();
+    });
+};
+
+// Get current agent profile (for logged-in agents)
+router.get('/profile', authenticateToken, async (req, res) => {
+    try {
+        if (!req.user.agentId) {
+            return res.status(403).json({ error: 'Not an agent account' });
+        }
+
+        const agent = await prisma.agent.findUnique({
+            where: { id: req.user.agentId },
+            include: {
+                candidates: {
+                    orderBy: { appliedAt: 'desc' },
+                    take: 10
+                },
+                jobs: true,
+                _count: {
+                    select: {
+                        candidates: true,
+                        jobs: true
+                    }
+                }
+            }
+        });
+
+        if (!agent) {
+            return res.status(404).json({ error: 'Agent profile not found' });
+        }
+
+        res.json(agent);
+    } catch (error) {
+        console.error('Error fetching agent profile:', error);
+        res.status(500).json({ error: 'Failed to fetch agent profile' });
+    }
+});
 
 // Get all agents
 router.get('/', async (req, res) => {
@@ -426,6 +480,44 @@ router.get('/:id/stats', async (req, res) => {
     } catch (error) {
         console.error('Error fetching agent stats:', error);
         res.status(500).json({ error: 'Failed to fetch agent statistics' });
+    }
+});
+
+// Get all jobs (recruitments) for candidate assignment
+router.get('/:id/jobs', async (req, res) => {
+    try {
+        const agentId = parseInt(req.params.id);
+        
+        // Get all active recruitment jobs
+        const jobs = await prisma.recruitment.findMany({
+            where: {
+                status: 'open',
+                OR: [
+                    { agentId: agentId },
+                    { agentId: null } // Also include unassigned jobs
+                ]
+            },
+            include: {
+                candidates: {
+                    where: { agentId: agentId },
+                    select: { id: true, status: true }
+                }
+            },
+            orderBy: { postedAt: 'desc' }
+        });
+
+        // Add candidate count for this agent
+        const jobsWithStats = jobs.map(job => ({
+            ...job,
+            candidatesFromAgent: job.candidates.length,
+            pendingCandidates: job.candidates.filter(c => c.status === 'pending').length,
+            hiredCandidates: job.candidates.filter(c => c.status === 'hired').length
+        }));
+
+        res.json(jobsWithStats);
+    } catch (error) {
+        console.error('Error fetching jobs for agent:', error);
+        res.status(500).json({ error: 'Failed to fetch jobs' });
     }
 });
 
