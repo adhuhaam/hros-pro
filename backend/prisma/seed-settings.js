@@ -10,13 +10,13 @@ async function seedSettings() {
             // General Settings
             {
                 key: 'company_name',
-                value: 'HRMS Pro',
+                value: 'HRoS Pro',
                 description: 'Company name displayed throughout the system',
                 category: 'general'
             },
             {
                 key: 'system_email',
-                value: 'admin@hrmspro.com',
+                value: 'sadmin@hros.com',
                 description: 'Primary system email address',
                 category: 'general'
             },
