@@ -11,8 +11,10 @@ import Settings from './pages/Settings';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
 import { HeaderProvider } from './context/HeaderContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './context/AuthContext';
 
 function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -70,10 +72,16 @@ function App() {
     <ThemeProvider>
       <HeaderProvider>
         <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/*" element={<Layout />} />
-          </Routes>
+          <AuthProvider>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/*" element={
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </AuthProvider>
         </Router>
       </HeaderProvider>
     </ThemeProvider>

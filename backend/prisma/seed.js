@@ -415,45 +415,43 @@ async function main() {
     // Seed Sample Recruitment Jobs
     const recruitmentJobs = [
         {
-            title: 'Senior Software Developer',
-            description: 'Experienced developer for web applications',
-            requirements: '5+ years experience, React, Node.js, MySQL',
+            position: 'Senior Software Developer',
+            department: 'IT',
             numberOfPosts: 3,
-            salary: 80000,
             status: 'ACTIVE',
             agentId: 1, // Tech Recruiters Inc
         },
         {
-            title: 'HR Manager',
-            description: 'Lead HR operations and team management',
-            requirements: '3+ years HR experience, leadership skills',
+            position: 'HR Manager',
+            department: 'HR',
             numberOfPosts: 1,
-            salary: 65000,
             status: 'ACTIVE',
             agentId: 2, // HR Solutions Pro
         },
         {
-            title: 'Marketing Specialist',
-            description: 'Digital marketing and brand management',
-            requirements: '2+ years marketing experience, social media skills',
+            position: 'Marketing Specialist',
+            department: 'Marketing',
             numberOfPosts: 2,
-            salary: 55000,
             status: 'ACTIVE',
             agentId: 3, // Talent Hunters
         },
     ];
 
+    // Create recruitment jobs only if they don't exist
     for (const job of recruitmentJobs) {
-        await prisma.recruitment.upsert({
+        const existingJob = await prisma.recruitment.findFirst({
             where: {
-                title_agentId: {
-                    title: job.title,
-                    agentId: job.agentId,
-                }
-            },
-            update: {},
-            create: job,
+                position: job.position,
+                department: job.department,
+                agentId: job.agentId,
+            }
         });
+        
+        if (!existingJob) {
+            await prisma.recruitment.create({
+                data: job,
+            });
+        }
     }
 
     console.log('Database seeded successfully with departments, designations, roles, permissions, superadmin user, sample employees, agents, and recruitment jobs!');
