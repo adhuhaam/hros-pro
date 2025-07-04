@@ -130,6 +130,7 @@ async function main() {
                     dateOfJoining: new Date('2023-01-01'),
                     departmentId: 1, // HR
                     designationId: 1, // Manager
+                    employeeId: 'EMP001',
                 },
             },
         },
@@ -163,6 +164,7 @@ async function main() {
             dateOfJoining: new Date('2023-02-15'),
             departmentId: 2, // IT
             designationId: 2, // Developer
+            employeeId: 'EMP002',
         },
         {
             fullName: 'Sarah Johnson',
@@ -173,6 +175,7 @@ async function main() {
             dateOfJoining: new Date('2023-03-01'),
             departmentId: 3, // Finance
             designationId: 3, // Accountant
+            employeeId: 'EMP003',
         },
         {
             fullName: 'Michael Brown',
@@ -183,6 +186,7 @@ async function main() {
             dateOfJoining: new Date('2023-04-10'),
             departmentId: 4, // Operations
             designationId: 4, // Executive
+            employeeId: 'EMP004',
         },
         {
             fullName: 'Emily Davis',
@@ -193,6 +197,7 @@ async function main() {
             dateOfJoining: new Date('2023-05-20'),
             departmentId: 5, // Marketing
             designationId: 5, // Analyst
+            employeeId: 'EMP005',
         },
         {
             fullName: 'David Wilson',
@@ -203,6 +208,7 @@ async function main() {
             dateOfJoining: new Date('2023-06-15'),
             departmentId: 6, // Sales
             designationId: 6, // Sales Representative
+            employeeId: 'EMP006',
         },
         {
             fullName: 'Lisa Anderson',
@@ -213,6 +219,7 @@ async function main() {
             dateOfJoining: new Date('2023-07-01'),
             departmentId: 2, // IT
             designationId: 2, // Developer
+            employeeId: 'EMP007',
         },
         {
             fullName: 'Robert Taylor',
@@ -223,6 +230,7 @@ async function main() {
             dateOfJoining: new Date('2023-08-10'),
             departmentId: 3, // Finance
             designationId: 3, // Accountant
+            employeeId: 'EMP008',
         },
         {
             fullName: 'Jennifer Martinez',
@@ -233,6 +241,7 @@ async function main() {
             dateOfJoining: new Date('2023-09-05'),
             departmentId: 1, // HR
             designationId: 4, // Executive
+            employeeId: 'EMP009',
         },
         {
             fullName: 'Christopher Garcia',
@@ -243,6 +252,7 @@ async function main() {
             dateOfJoining: new Date('2023-10-15'),
             departmentId: 5, // Marketing
             designationId: 5, // Analyst
+            employeeId: 'EMP010',
         },
         {
             fullName: 'Amanda Rodriguez',
@@ -253,6 +263,7 @@ async function main() {
             dateOfJoining: new Date('2023-11-20'),
             departmentId: 6, // Sales
             designationId: 6, // Sales Representative
+            employeeId: 'EMP011',
         },
         // Add some employees from 2024 for turnover analysis
         {
@@ -264,6 +275,7 @@ async function main() {
             dateOfJoining: new Date('2024-01-15'),
             departmentId: 2, // IT
             designationId: 2, // Developer
+            employeeId: 'EMP012',
         },
         {
             fullName: 'Rachel Green',
@@ -274,6 +286,7 @@ async function main() {
             dateOfJoining: new Date('2024-02-01'),
             departmentId: 4, // Operations
             designationId: 4, // Executive
+            employeeId: 'EMP013',
         },
         {
             fullName: 'Thomas White',
@@ -284,6 +297,7 @@ async function main() {
             dateOfJoining: new Date('2024-03-10'),
             departmentId: 3, // Finance
             designationId: 3, // Accountant
+            employeeId: 'EMP014',
         },
         {
             fullName: 'Nicole Clark',
@@ -294,6 +308,7 @@ async function main() {
             dateOfJoining: new Date('2024-04-05'),
             departmentId: 1, // HR
             designationId: 5, // Analyst
+            employeeId: 'EMP015',
         },
         {
             fullName: 'Daniel Lewis',
@@ -304,6 +319,7 @@ async function main() {
             dateOfJoining: new Date('2024-05-20'),
             departmentId: 5, // Marketing
             designationId: 6, // Sales Representative
+            employeeId: 'EMP016',
         }
     ];
 
