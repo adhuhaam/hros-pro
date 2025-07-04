@@ -110,22 +110,22 @@ async function main() {
     }
 
     // Seed Superadmin User
-    const password = await bcrypt.hash('superadminpassword', 10);
+    const password = await bcrypt.hash('Ompl@65482*', 10);
     const superadminRole = await prisma.role.findUnique({ where: { name: 'superadmin' } });
 
     const superadminUser = await prisma.user.upsert({
-        where: { email: 'superadmin@yourdomain.com' },
+        where: { email: 'sadmin@hros.com' },
         update: {},
         create: {
-            email: 'superadmin@yourdomain.com',
+            email: 'sadmin@hros.com',
             password,
             fullName: 'Super Admin',
             employee: {
                 create: {
-                    fullName: 'Super Admin',
-                    email: 'superadmin@yourdomain.com',
-                    phone: '+1234567890',
-                    address: '123 Admin Street, City, State',
+                    fullName: 'Sadmin',
+                    email: 'sadmin@hros.com',
+                    phone: '+9603317878',
+                    address: 'M.Nector',
                     dob: new Date('1985-01-15'),
                     dateOfJoining: new Date('2023-01-01'),
                     departmentId: 1, // HR
