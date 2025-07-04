@@ -18,7 +18,12 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
+      // Clean up any legacy token stored in localStorage (from previous versions)
+      if (localStorage.getItem('token')) {
+        localStorage.removeItem('token');
+      }
+
+      const token = sessionStorage.getItem('token');
       if (!token) {
         setLoading(false);
         return;
@@ -35,11 +40,11 @@ export const AuthProvider = ({ children }) => {
           const userData = await response.json();
           setUser(userData);
         } else {
-          localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        localStorage.removeItem('token');
+        sessionStorage.removeItem('token');
       } finally {
         setLoading(false);
       }
@@ -49,12 +54,12 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (token, userData) => {
-    localStorage.setItem('token', token);
+    sessionStorage.setItem('token', token);
     setUser(userData);
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     setUser(null);
     navigate('/login');
   };
