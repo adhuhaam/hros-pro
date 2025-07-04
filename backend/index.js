@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
 const { PrismaClient } = require('./generated/prisma');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
@@ -14,8 +15,47 @@ const settingsRouter = require('./routes/settings');
 const app = express();
 const prisma = new PrismaClient();
 
-app.use(cors());
+// Session configuration
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your-secret-key-for-sessions',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // Only use secure cookies in production
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' ? process.env.FRONTEND_URL : 'http://localhost:5173',
+    credentials: true
+}));
 app.use(express.json());
+
+// JWT verification middleware
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if (!token) {
+        return res.status(401).json({ message: 'Access token required' });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET || 'devsecret', (err, decoded) => {
+        if (err) {
+            return res.status(403).json({ message: 'Invalid or expired token' });
+        }
+        
+        // Additional session validation
+        if (req.session && req.session.userId && req.session.userId !== decoded.userId) {
+            return res.status(403).json({ message: 'Session mismatch' });
+        }
+        
+        req.user = decoded;
+        next();
+    });
+};
 
 // User management routes
 app.use('/api/users', usersRouter);
@@ -73,6 +113,10 @@ app.post('/api/auth/login', async (req, res) => {
             { expiresIn: '1d' }
         );
 
+        // Store user session
+        req.session.userId = user.id;
+        req.session.userEmail = user.email;
+        
         res.json({
             token,
             user: {
@@ -85,6 +129,60 @@ app.post('/api/auth/login', async (req, res) => {
         });
     } catch (err) {
         console.error(err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Add the missing authentication verification endpoint
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.userId },
+            include: {
+                userRoles: {
+                    include: {
+                        role: true
+                    }
+                },
+                employee: true,
+                agent: true
+            }
+        });
+
+        if (!user || !user.isActive) {
+            return res.status(401).json({ message: 'User not found or inactive' });
+        }
+
+        const roles = user.userRoles.map(ur => ur.role.name);
+        const userType = user.employee ? 'employee' : user.agent ? 'agent' : 'user';
+
+        res.json({
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            roles: roles,
+            userType: userType
+        });
+    } catch (err) {
+        console.error('Auth verification error:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Logout endpoint
+app.post('/api/auth/logout', authenticateToken, async (req, res) => {
+    try {
+        // Destroy the session
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Session destroy error:', err);
+                return res.status(500).json({ message: 'Failed to logout' });
+            }
+            res.clearCookie('connect.sid'); // Clear the session cookie
+            res.json({ message: 'Logged out successfully' });
+        });
+    } catch (err) {
+        console.error('Logout error:', err);
         res.status(500).json({ message: 'Internal server error' });
     }
 });
