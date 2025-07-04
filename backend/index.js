@@ -89,6 +89,64 @@ app.post('/api/auth/login', async (req, res) => {
     }
 });
 
+// JWT verification middleware
+const verifyToken = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ message: 'Invalid token format' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'devsecret');
+        req.user = decoded;
+        next();
+    } catch (err) {
+        console.error('Token verification error:', err);
+        return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+};
+
+// Get current user endpoint
+app.get('/api/auth/me', verifyToken, async (req, res) => {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: req.user.userId },
+            include: {
+                userRoles: {
+                    include: {
+                        role: true
+                    }
+                },
+                employee: true,
+                agent: true
+            }
+        });
+
+        if (!user || !user.isActive) {
+            return res.status(401).json({ message: 'User not found or inactive' });
+        }
+
+        const roles = user.userRoles.map(ur => ur.role.name);
+        const userType = user.employee ? 'employee' : user.agent ? 'agent' : 'user';
+
+        res.json({
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            roles: roles,
+            userType: userType
+        });
+    } catch (err) {
+        console.error('Error fetching user:', err);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 // Employees CRUD API
 app.get('/api/employees', async (req, res) => {
     try {

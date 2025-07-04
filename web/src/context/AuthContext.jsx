@@ -35,11 +35,15 @@ export const AuthProvider = ({ children }) => {
           const userData = await response.json();
           setUser(userData);
         } else {
+          // Token is invalid or expired
+          console.error('Auth check failed:', response.status);
           localStorage.removeItem('token');
+          setUser(null);
         }
       } catch (error) {
         console.error('Auth check failed:', error);
         localStorage.removeItem('token');
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -51,6 +55,7 @@ export const AuthProvider = ({ children }) => {
   const login = (token, userData) => {
     localStorage.setItem('token', token);
     setUser(userData);
+    navigate('/'); // Navigate to dashboard after login
   };
 
   const logout = () => {
